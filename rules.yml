@@ -1,0 +1,75 @@
+- capture: "([^_.]+)"
+  blacklist:
+    - Large
+    - Deeper
+    - Deeper2
+    - Deeper3
+    - Deeper4                                                                       
+
+- name: Annotate
+  rules:
+    - attribute_path: ["image", "roicount"]
+      operation: lt
+      value: 1
+- name: Finished
+  rules:
+    - attribute_path: ["image", "roicount"]
+      operation: gt
+      value: 0
+
+- name: "Transferred ROIs"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "textvalue"]
+      operation: eq
+      value: "Transferred ROIs"
+
+- name: PROSTATE
+  rules:
+    - attribute_path: ["image", "parent", "parent"]
+      operation: eq
+      value: "PROSTATE"
+- name: "Benign Atrophy"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: 255
+- name: "Seminal Vesicles"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: 420806655
+- name: "HGPIN"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: -8781569
+- name: "Corpora"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: -15728385
+- name: "Grade 3"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: 822031103
+- name: "Grade  4 FG"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: -387841
+- name: "Grade 4 CG"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: -32047105
+- name: "Grade 5"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: 570425343
+- name: "Vessel"
+  rules:
+    - attribute_path: ["image", "roi", "shape", "strokecolor"]
+      operation: eq
+      value: -1245970945

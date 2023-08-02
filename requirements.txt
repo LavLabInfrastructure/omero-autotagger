@@ -1,0 +1,3 @@
+yaml
+inflect
+omero-py

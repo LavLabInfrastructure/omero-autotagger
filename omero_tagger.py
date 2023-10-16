@@ -56,12 +56,24 @@ class OmeroTagger():
         self.conn.close()
 
     def _get_method(self, obj, attr_name):
+        obj_class = obj.__class__  # get the class of the object
         lower_case_attr_name = attr_name.lower()
-        for name in dir(obj):
-            if name.lower() == 'get'+lower_case_attr_name or name.lower() == 'list'+lower_case_attr_name:
+
+        # First attempt: Look for methods in the class definition
+        for name in dir(obj_class):
+            if name.lower() == 'get' + lower_case_attr_name or name.lower() == 'list' + lower_case_attr_name:
                 return getattr(obj, name)
-        print(f"invalid: {attr_name}")
-        return None
+
+        # Second attempt: Directly try to get the attribute
+        try:
+            return getattr(obj, 'get' + lower_case_attr_name.capitalize())
+        except AttributeError:
+            try:
+                return getattr(obj, 'list' + lower_case_attr_name.capitalize())
+            except AttributeError:
+                print(f"invalid: {attr_name}")
+                return lambda: print(f'could not get property: {attr_name}')
+
 
     def _validate_attr_path(self, path: list[str]):
         """
@@ -184,15 +196,13 @@ class OmeroTagger():
         return name_rules, attr_rules, attr_names, path_tree
     
 
-    def _apply_name_rules(self, obj_type, obj):
+    def _apply_name_rules(self, obj, name_rules):
         """
         Checks name_rules for rules governing this 
         """
         rv = []
         name = obj.getName()
-        for rule in self.name_rules:
-            if rule['object'] != obj_type:
-                continue
+        for rule in name_rules:
             if rule['include_extension'] is True:
                 string = name
             else:
@@ -210,7 +220,7 @@ class OmeroTagger():
                         rv.append(rule['format'].format(*match))
         return rv
         
-    def _apply_attr_rules(self, obj, obj_type, attr_names, path_tree):
+    def _apply_attr_rules(self, obj, obj_type, attr_rules, attr_names, path_tree):
         """
         Checks attr_rules for rules governing this object_type. 
         RECURSIVE
@@ -220,19 +230,23 @@ class OmeroTagger():
         for attr_name in keys:
             # if last, is attribute, generate and use a getter, check rules for this attr and append valid tags
             if attr_name in attr_names:
+                getter = self._get_method(obj, attr_name)
+                val = getter()
                 if hasattr(val, 'getValue'): # autounwrap
                     val = val.getValue()
                 
-                for tag_rule in self.attr_rules.get(obj_type, []):
-                    # AND logic for tagging rules
+                for tag_rule in attr_rules.get(obj_type, []):
                     follows_rule = True
                     for rule in tag_rule['rules']:
-                        if rule['attribute_path'][-1] == attr_name: # if the last 
+                        if rule['attribute_path'][-1] == attr_name:
                             op = self.OPERATIONS[rule['operation']]
                             const_val = rule['value']
-                        if op(val, const_val) is not True:
-                            follows_rule = False
-                            break
+                            if op(val, const_val) is not True:
+                                follows_rule = False
+                                break
+                        else: 
+                            follows_rule = None
+                            continue
                     if follows_rule is True:
                         tag_vals.append(tag_rule['name'])
                     elif follows_rule is False and tag_rule['absolute'] is True:
@@ -273,7 +287,15 @@ class OmeroTagger():
             self.tag_map.update({tag_val:tag})
         return tag
 
-    def apply_rules(self, name_rules, attr_rules, attr_names, path_tree):
+    def apply_rules(self, name_rules=None, attr_rules=None, attr_names=None, path_tree=None):
+        if name_rules is None:
+            name_rules = self.name_rules
+        if attr_rules is None:
+            attr_rules = self.attr_rules
+        if attr_names is None:
+            attr_names = self.attr_names
+        if path_tree is None:
+            path_tree = self.path_tree
         for parent_obj_type in path_tree.keys():
             for parent_obj in self.conn.getObjects(parent_obj_type):
                 name_tagvals = self._apply_name_rules(parent_obj, name_rules)
@@ -376,5 +398,5 @@ if __name__ == "__main__":
     conn = establish_connection(args.server, args.port, args.user, args.password, args.secure, args.session)
 
     tagger = OmeroTagger(conn, tag_rules, args.patch)
-    tagger.apply_rules()  # If apply_rules needs arguments, you should provide them here.
+    tagger.apply_rules()  
     tagger.close()

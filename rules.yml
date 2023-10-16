@@ -53,7 +53,7 @@
     - attribute_path: ["image", "roi", "shape", "strokecolor"]
       operation: eq
       value: 822031103
-- name: "Grade  4 FG"
+- name: "Grade 4 FG"
   rules:
     - attribute_path: ["image", "roi", "shape", "strokecolor"]
       operation: eq

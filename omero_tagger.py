@@ -4,6 +4,7 @@ import yaml
 import logging
 import argparse
 import importlib.util
+import csv
 
 import inflect
 
@@ -136,6 +137,8 @@ class OmeroTagger():
                 name_rules.append(tag_rule)
                 if tag_rule['object'] not in path_tree: 
                     path_tree.update({tag_rule['object']:{}})
+                else:
+                    continue
                 
             # attribute based tagging 
             elif 'name' in tag_rule: 
@@ -155,7 +158,6 @@ class OmeroTagger():
                     if 'attribute_path' not in rule or 'operation' not in rule or 'value' not in rule:
                         logging.error(f"Incomplete rule! path: {rule.get('attribute_path')}, operation: {rule.get('operation')}, value: {rule.get('value')}")
                         raise ValueError()
-                    
                     
                     if rule['operation'] not in self.OPERATIONS.keys(): # check operation
                         logging.error(f"Unknown operation: {rule['operation']}")
@@ -262,7 +264,11 @@ class OmeroTagger():
                 gotten = getter()
                 
                 for parent_obj in gotten:
-                    tv, ftv = self._apply_attr_rules(parent_obj, attr_name, attr_names, path_tree[attr_name])
+                    try:
+                        tv, ftv = self._apply_attr_rules(parent_obj, attr_name, attr_names, path_tree[attr_name])
+                    except TypeError as e:
+                        print(f"Caught error {e}")
+                      
                     tag_vals.extend(tv)
                     false_tag_vals.extend(ftv)
 
@@ -296,6 +302,12 @@ class OmeroTagger():
             attr_names = self.attr_names
         if path_tree is None:
             path_tree = self.path_tree
+
+        if dry_run:
+            with open('tags.csv', 'a', newline='') as csvfile:
+                        writer = csv.writer(csvfile)
+                        writer.writerow(['Slide Name', 'True Tags', 'False Tags'])
+
         for parent_obj_type in path_tree.keys():
             for parent_obj in self.conn.getObjects(parent_obj_type):
                 name_tagvals = self._apply_name_rules(parent_obj, name_rules)
@@ -303,8 +315,12 @@ class OmeroTagger():
                 
                 true_tag_vals, false_tag_vals = [*set([*name_tagvals, *attr_tagvals])], [*set(remove_tags)]
 
-                print(f" {parent_obj.getName()}: TRUE: {true_tag_vals} FALSE: {false_tag_vals}")
-                            
+                if dry_run:
+                    with open('tags.csv', 'a', newline='') as csvfile:
+                        writer = csv.writer(csvfile)
+                        writer.writerow([parent_obj.getName(), ', '.join(true_tag_vals), ', '.join(false_tag_vals)])                    
+                    continue
+                print(f" {parent_obj.getName()}: TRUE: {true_tag_vals} FALSE: {false_tag_vals}")                            
                 existing_links = parent_obj.listAnnotations()
                 for tag_val in false_tag_vals:
                     to_delete=[]
@@ -384,12 +400,23 @@ if __name__ == "__main__":
         type=str,
         help='Session key to use for connecting to the server. If this is provided, username and password are not required.'
     )
+    parser.add_argument(
+        '--dry',
+        action= 'store_true',
+        help='Perform a dry run of the autotagger displaying what tags will be added/removed. Output will be sent to csv file'
+    )
 
     args = parser.parse_args()
 
     # Check if user and password are provided if session is not provided
     if args.session is None and (args.user is None or args.password is None):
         parser.error("The options --user and --password are required if --session is not provided")
+
+    if args.dry:
+        dry_run = True
+        print('This will be a dry run, the tags will not be committed. The output will be sent to a csv file.')
+    else:
+        dry_run = False
 
     # Load tag rules from the YAML file
     with open(args.tag_rules, 'r') as file:

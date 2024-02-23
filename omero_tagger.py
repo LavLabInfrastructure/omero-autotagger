@@ -358,7 +358,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         'tag_rules',
-        #required=True, 
+        required=True, 
         type=str,
         help='Path to the YAML file containing the tagging rules to be applied.'
     )
@@ -369,7 +369,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         '-s', '--server', #host=wss://wsi.lavlab.mcw.edu/omero-wss
-        #required=True,
+        required=True,
         type=str,
         help='Address of the OMERO server to connect to.'
     )

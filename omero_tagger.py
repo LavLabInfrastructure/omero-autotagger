@@ -5,7 +5,7 @@ import logging
 import argparse
 import importlib.util
 import csv
-
+import os
 import inflect
 
 from omero import gateway
@@ -358,7 +358,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         'tag_rules',
-        required=True,
+        #required=True, 
         type=str,
         help='Path to the YAML file containing the tagging rules to be applied.'
     )
@@ -368,13 +368,13 @@ if __name__ == "__main__":
         help='Path to the Python patch script to use for tagging.'
     )
     parser.add_argument(
-        '-s', '--server',
-        required=True,
+        '-s', '--server', #host=wss://wsi.lavlab.mcw.edu/omero-wss
+        #required=True,
         type=str,
         help='Address of the OMERO server to connect to.'
     )
     parser.add_argument(
-        '-p', '--port',
+        '-p', '--port', #port=443
         required=True,
         type=int,
         help='Port number of the OMERO server to connect to.'
@@ -410,7 +410,26 @@ if __name__ == "__main__":
 
     # Check if user and password are provided if session is not provided
     if args.session is None and (args.user is None or args.password is None):
-        parser.error("The options --user and --password are required if --session is not provided")
+            args.user = os.getenv('OMERO_USER')
+            args.password = os.getenv('OMERO_PASS')
+            args.port = os.getenv('OMERO_PORT')
+            args.server = os.getenv('OMERO_SERVER')
+            if args.session is None and (args.user is None or args.password is None):
+                parser.error("The options --user and --password are required if --session is not provided")
+
+    # os.environ['OMERO_USER'] = 
+    # os.environ['OMERO_PASS'] = 
+    # os.environ['OMERO_SERVER'] = 
+    # os.environ['OMERO_PORT'] = 
+
+    # OMERO_PASS
+    # OMERO_USER
+    # OMERO_SERVER
+    # OMERO_PORT = os.getenv('')
+    # args.user = os.getenv('OMERO_USER')
+    # args.password = os.getenv('OMERO_PASS')
+    # args.port = os.getenv('OMERO_PORT')
+    # args.server = os.getenv('OMERO_SERVER')
 
     if args.dry:
         dry_run = True

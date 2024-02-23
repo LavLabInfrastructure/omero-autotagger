@@ -2,7 +2,7 @@
     "name": "Python 3",
     "build": {
         "dockerfile": "Dockerfile",
-        "context": "."
+        "context": ".."
     },
     "customizations": {
       "vscode": {

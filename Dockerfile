@@ -1,14 +1,21 @@
-FROM python:3.10
+# Use the official Python 3 image.
+FROM python:3.9-slim
 
-ENV OMERO_USER fkyereme
-ENV OMERO_PASS Medical2023
-ENV OMERO_SERVER 
-ENV OMERO_PORT
+# Create a non-root user.
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
+RUN apt update && apt install build-essential
+# Set the working directory.
+WORKDIR /workspace
 
-WORKDIR /app
+# Copy the requirements file.
+COPY requirements.txt /workspace/
 
-COPY . /app
+# Install dependencies.
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install -r requirements.txt
-
-CMD ["python", "omero_tagger.py"]
+# Switch to the non-root user.
+USER $USERNAME

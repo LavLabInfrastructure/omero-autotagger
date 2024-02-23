@@ -264,10 +264,7 @@ class OmeroTagger():
                 gotten = getter()
                 
                 for parent_obj in gotten:
-                    try:
-                        tv, ftv = self._apply_attr_rules(parent_obj, attr_name, attr_names, path_tree[attr_name])
-                    except TypeError as e:
-                        print(f"Caught error {e}")
+                    tv, ftv = self._apply_attr_rules(parent_obj, attr_name, attr_names, path_tree[attr_name])
                       
                     tag_vals.extend(tv)
                     false_tag_vals.extend(ftv)

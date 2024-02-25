@@ -13,7 +13,8 @@ WORKDIR /workspace
 COPY requirements.txt /workspace/
 
 # Install dependencies.
-RUN pip install --no-cache-dir -r requirements.txt
+RUN /opt/omero-venv/bin/pip3 install --no-cache-dir -r requirements.txt
+RUN . /opt/omero-venv/bin/activate
 
 # Switch to the non-root user.
 USER $USERNAME

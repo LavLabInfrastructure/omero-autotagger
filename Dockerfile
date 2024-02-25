@@ -1,4 +1,4 @@
-# Use the official Python 3 image.
+# use our custom docker image based on the official python/python image
 FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container
 # Create a non-root user.
 ARG USERNAME=vscode

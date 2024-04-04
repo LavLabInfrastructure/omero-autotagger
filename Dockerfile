@@ -1,11 +1,8 @@
 # use our custom docker image based on the official python/python image
 FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container
-# Create a non-root user.
-ARG USERNAME=vscode
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
+
+RUN groupadd --gid 1000 vscode \
+    && useradd --uid 1000 --gid 1000 -m vscode
 # Set the working directory.
 WORKDIR /workspace
 
@@ -17,4 +14,4 @@ RUN /opt/omero-venv/bin/pip3 install --no-cache-dir -r requirements.txt
 RUN . /opt/omero-venv/bin/activate
 
 # Switch to the non-root user.
-USER $USERNAME
+USER vscode

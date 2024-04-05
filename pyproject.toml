@@ -38,6 +38,9 @@ Source = "https://github.com/LavLabInfrastructure/omero-autotagger"
 [tool.hatch.version]
 path = "src/omero_autotagger/__about__.py"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/omero_autotagger"]
+
 [tool.hatch.env]
 requires = [
     "hatch-pip-compile"

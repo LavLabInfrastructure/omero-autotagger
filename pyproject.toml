@@ -36,7 +36,7 @@ Issues = "https://github.com/LavLabInfrastructure/omero-autotagger/issues"
 Source = "https://github.com/LavLabInfrastructure/omero-autotagger"
 
 [tool.hatch.version]
-path = "src/python_template/__about__.py"
+path = "src/omero_autotagger/__about__.py"
 
 [tool.hatch.env]
 requires = [

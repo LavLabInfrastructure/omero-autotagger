@@ -1,17 +1,25 @@
-# use our custom docker image based on the official python/python image
-FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container
+ARG OMEROPY_VERSION=latest
+FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container:$OMEROPY_VERSION
 
 RUN groupadd --gid 1000 vscode \
     && useradd --uid 1000 --gid 1000 -m vscode
-# Set the working directory.
-WORKDIR /workspace
 
-# Copy the requirements file.
-COPY requirements.txt /workspace/
+WORKDIR /app
+COPY . /app/
+RUN chown -R vscode /app
 
-# Install dependencies.
-RUN /opt/omero-venv/bin/pip3 install --no-cache-dir -r requirements.txt
-RUN . /opt/omero-venv/bin/activate
+FROM base AS hatch
+RUN pip3 install hatch
+ENV HATCH_ENV=default
+ENTRYPOINT ["hatch", "run"]
 
-# Switch to the non-root user.
+FROM base AS dev
+RUN pip3 install hatch 
+RUN hatch build
+RUN pip3 install $(find requirements -name 'requirement*.txt' -exec echo -n '-r {} ' \;)
+USER vscode
+
+FROM base AS prod
+COPY --from=dev /app/dist/*.whl /tmp
+RUN pip3 install /tmp/*.whl
 USER vscode

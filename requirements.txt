@@ -1,3 +1,0 @@
-pyyaml
-inflect
-omero-py

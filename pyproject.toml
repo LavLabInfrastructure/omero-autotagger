@@ -97,7 +97,7 @@ serve-docs = "mkdocs serve"
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.coverage.run]
-source_pkgs = ["omero_autotagger", "tests"]
+source_pkgs = ["src/omero_autotagger", "tests"]
 branch = true
 parallel = true
 omit = [

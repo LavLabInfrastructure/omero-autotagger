@@ -1,5 +1,5 @@
 ARG OMEROPY_VERSION=latest
-FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container:$OMEROPY_VERSION
+FROM ghcr.io/lavlabinfrastructure/lavlab-omeropy-container:$OMEROPY_VERSION as base
 
 RUN groupadd --gid 1000 vscode \
     && useradd --uid 1000 --gid 1000 -m vscode

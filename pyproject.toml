@@ -77,7 +77,7 @@ dependencies = [
   "mypy>=1.0.0",
 ]
 [tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/python_template tests}"
+check = "mypy --install-types --non-interactive {args:src/omero_autotagger tests}"
 
 [tool.hatch.envs.docs]
 dependencies = [
@@ -97,15 +97,15 @@ serve-docs = "mkdocs serve"
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.coverage.run]
-source_pkgs = ["python_template", "tests"]
+source_pkgs = ["omero_autotagger", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/python_template/__about__.py",
+  "src/omero_autotagger/__about__.py",
 ]
 
 [tool.coverage.paths]
-python_template = ["src/python_template", "*/omero-autotagger/src/python_template"]
+omero_autotagger = ["src/omero_autotagger", "*/omero-autotagger/src/omero_autotagger"]
 tests = ["tests", "*/omero-autotagger/tests"]
 
 [tool.coverage.report]

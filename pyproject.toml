@@ -31,9 +31,9 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/LavLabInfrastructure/python-template#readme"
-Issues = "https://github.com/LavLabInfrastructure/python-template/issues"
-Source = "https://github.com/LavLabInfrastructure/python-template"
+Documentation = "https://github.com/LavLabInfrastructure/omero-autotagger#readme"
+Issues = "https://github.com/LavLabInfrastructure/omero-autotagger/issues"
+Source = "https://github.com/LavLabInfrastructure/omero-autotagger"
 
 [tool.hatch.version]
 path = "src/python_template/__about__.py"
@@ -105,8 +105,8 @@ omit = [
 ]
 
 [tool.coverage.paths]
-python_template = ["src/python_template", "*/python-template/src/python_template"]
-tests = ["tests", "*/python-template/tests"]
+python_template = ["src/python_template", "*/omero-autotagger/src/python_template"]
+tests = ["tests", "*/omero-autotagger/tests"]
 
 [tool.coverage.report]
 exclude_lines = [

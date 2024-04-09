@@ -13,6 +13,7 @@ keywords = []
 authors = [
   { name = "barrettMCW", email = "mjbarrett@mcw.edu" },
 ]
+
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
@@ -24,9 +25,15 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
+
 dependencies = [
   "pyyaml",
   "inflect",
+  "zeroc-ice @ https://github.com/glencoesoftware/zeroc-ice-py-linux-x86_64/releases/download/20240202/zeroc_ice-3.6.5-cp38-cp38-manylinux_2_28_x86_64.whl#sha=7fb489530bc2ea3ee2bcf485c032e64e87669fc3811d5d0ae4e8b1172e488e47 ; python_version == '3.8' and platform_system == 'Linux'",
+  "zeroc-ice @ https://github.com/glencoesoftware/zeroc-ice-py-linux-x86_64/releases/download/20240202/zeroc_ice-3.6.5-cp39-cp39-manylinux_2_28_x86_64.whl#sha=36d2f8448a45d253a4e2aed5c711e1be95b9d32f0afbe6ce42a2e12f04cbe821 ; python_version == '3.9' and platform_system == 'Linux'",
+  "zeroc-ice @ https://github.com/glencoesoftware/zeroc-ice-py-linux-x86_64/releases/download/20240202/zeroc_ice-3.6.5-cp310-cp310-manylinux_2_28_x86_64.whl#sha=30511316787eca4cabf13804373884ec16b385afa8bf2e764c004ffc28f75dcf ; python_version == '3.10' and platform_system == 'Linux'",
+  "zeroc-ice @ https://github.com/glencoesoftware/zeroc-ice-py-linux-x86_64/releases/download/20240202/zeroc_ice-3.6.5-cp311-cp311-manylinux_2_28_x86_64.whl#sha=9ca8e9374fbea996264d70098a74f6f1a9cad063921099edc9ab24fce0344b4c ; python_version == '3.11' and platform_system == 'Linux'",
+  "zeroc-ice @ https://github.com/glencoesoftware/zeroc-ice-py-linux-x86_64/releases/download/20240202/zeroc_ice-3.6.5-cp312-cp312-manylinux_2_28_x86_64.whl#sha=96fb9066912c52f2503e9f9207f98d51de79c475d19ebd3157aae7bc522b5826 ; python_version == '3.12' and platform_system == 'Linux'",
   "omero-py"
 ]
 
@@ -34,6 +41,10 @@ dependencies = [
 Documentation = "https://github.com/LavLabInfrastructure/omero-autotagger#readme"
 Issues = "https://github.com/LavLabInfrastructure/omero-autotagger/issues"
 Source = "https://github.com/LavLabInfrastructure/omero-autotagger"
+
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.version]
 path = "src/omero_autotagger/__about__.py"

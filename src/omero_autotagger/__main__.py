@@ -81,6 +81,9 @@ class OmeroTagger():
         Checks attribute path by doing mock tests on wrappers
         """
         for i, obj in enumerate(path[:-1]):
+            # parent is an abstract keywork, it's allowed
+            if obj.lower() == 'parent':
+                continue
             wrapper = gateway.KNOWN_WRAPPERS.get(obj)
             if wrapper is None:
                 logging.warning(f"Could not validate or invalidate path: {[path]}: Wrapper for object: {obj} does not exist! Continuing, but errors may occur!")
@@ -264,26 +267,26 @@ class OmeroTagger():
                 gotten = getter()
                 
                 for parent_obj in gotten:
-                    tv, ftv = self._apply_attr_rules(parent_obj, attr_name, attr_names, path_tree[attr_name])
-                      
+                    tv, ftv = self._apply_attr_rules(parent_obj, attr_name, attr_rules, attr_names, path_tree[attr_name])
+  
                     tag_vals.extend(tv)
                     false_tag_vals.extend(ftv)
 
         return tag_vals, false_tag_vals
         
-    def _create_tag(conn, tag_val):
-        tag = gateway.TagAnnotationWrapper(conn)
+    def _create_tag(self, tag_val):
+        tag = gateway.TagAnnotationWrapper(self.conn)
         tag.setDescription("Autotagged")
         tag.setValue(tag_val)
         tag.save()
         return tag
 
-    def _get_tag(self,tag_val):
+    def _get_tag(self, tag_val):
         tag = self.tag_map.get(tag_val)
         if tag is None:
             tag=list(self.conn.getObjects('TagAnnotation', attributes={'textValue': tag_val}))
             if not tag:
-                tag = self._create_tag(self.conn, tag_val)
+                tag = self._create_tag(tag_val)
             else:
                 tag = tag[0]
             
@@ -355,23 +358,22 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         'tag_rules',
-        required=True, 
         type=str,
         help='Path to the YAML file containing the tagging rules to be applied.'
     )
     parser.add_argument(
-        'patch',
+        '--patch',
         type=str,
         help='Path to the Python patch script to use for tagging.'
     )
     parser.add_argument(
-        '-s', '--server', #host=wss://wsi.lavlab.mcw.edu/omero-wss
+        '-s', '--server', 
         required=True,
         type=str,
         help='Address of the OMERO server to connect to.'
     )
     parser.add_argument(
-        '-p', '--port', #port=443
+        '-p', '--port',
         required=True,
         type=int,
         help='Port number of the OMERO server to connect to.'
@@ -405,37 +407,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Check if user and password are provided if session is not provided
-    if args.session is None and (args.user is None or args.password is None):
-            args.user = os.getenv('OMERO_USER')
-            args.password = os.getenv('OMERO_PASS')
-            args.port = os.getenv('OMERO_PORT')
-            args.server = os.getenv('OMERO_SERVER')
-            if args.session is None and (args.user is None or args.password is None):
-                parser.error("The options --user and --password are required if --session is not provided")
-
-    # os.environ['OMERO_USER'] = 
-    # os.environ['OMERO_PASS'] = 
-    # os.environ['OMERO_SERVER'] = 
-    # os.environ['OMERO_PORT'] = 
-
-    # OMERO_PASS
-    # OMERO_USER
-    # OMERO_SERVER
-    # OMERO_PORT = os.getenv('')
-    # args.user = os.getenv('OMERO_USER')
-    # args.password = os.getenv('OMERO_PASS')
-    # args.port = os.getenv('OMERO_PORT')
-    # args.server = os.getenv('OMERO_SERVER')
-
-    if args.dry:
-        dry_run = True
+    dry_run = args.dry
+    if dry_run:
         print('This will be a dry run, the tags will not be committed. The output will be sent to a csv file.')
-    else:
-        dry_run = False
 
     # Load tag rules from the YAML file
-    with open(args.tag_rules, 'r') as file:
+    with open(args.tag_rules, 'r', encoding='utf-8') as file:
         tag_rules = yaml.safe_load(file)
 
     conn = establish_connection(args.server, args.port, args.user, args.password, args.secure, args.session)

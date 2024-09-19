@@ -8,18 +8,21 @@ WORKDIR /app
 COPY . /app/
 RUN chown -R vscode /app
 
-FROM base AS hatch
 RUN pip3 install hatch
+RUN hatch run build
+
+FROM base AS hatch
 ENV HATCH_ENV=default
 ENTRYPOINT ["hatch", "run"]
 
-FROM base AS dev
-RUN pip3 install hatch 
-RUN hatch build
-RUN pip3 install $(find requirements -name 'requirement*.txt' -exec echo -n '-r {} ' \;)
+FROM base AS prod
+RUN pip3 install /app/dist/*.whl
 USER vscode
 
-FROM base AS prod
-COPY --from=dev /app/dist/*.whl /tmp
-RUN pip3 install /tmp/*.whl
+FROM base as dev
+ENV PATH ~/.local/bin:$PATH
+RUN pip3 install hatch 
+RUN find requirements -name 'requirement*.txt' | while read requirement; do \
+        pip3 install -r "$requirement"; \
+    done
 USER vscode

@@ -66,6 +66,7 @@ pip-compile-hashes = true
 dependencies = []
 
 [tool.hatch.envs.default.scripts]
+it = "hatch build && chmod -R 777 dist/*"
 build = "hatch build && chmod -R 777 dist/*"
 
 [tool.hatch.envs.test]
@@ -75,6 +76,7 @@ dependencies = [
   "coverage[toml]>=6.2"
 ]
 [tool.hatch.envs.test.scripts]
+it = "pytest --cov=src --cov-report=term-missing {args:tests}"
 test = "pytest {args:tests}"
 cov = "pytest --cov=src --cov-report=term-missing {args:tests}"
 
@@ -85,6 +87,7 @@ dependencies = [
   "black"
 ]
 [tool.hatch.envs.lint.scripts]
+it = "black src tests && pylint src tests"
 lint = "pylint src tests"
 format = "black src tests"
 check = "black src tests --check"
@@ -92,9 +95,11 @@ check = "black src tests --check"
 [tool.hatch.envs.types]
 dependencies = [
   "mypy>=1.0.0",
+  "types-pyyaml",
 ]
 [tool.hatch.envs.types.scripts]
 check = "mypy --install-types --non-interactive {args:src/omero_autotagger tests}"
+it = "mypy --install-types --non-interactive {args:src/omero_autotagger tests}"
 
 [tool.hatch.envs.docs]
 dependencies = [
@@ -107,6 +112,7 @@ dependencies = [
   "mkdocs-git-revision-date-localized-plugin"
 ]
 [tool.hatch.envs.docs.scripts]
+it = "mkdocs build"
 build-docs = "mkdocs build"
 serve-docs = "mkdocs serve"
 

@@ -3,34 +3,50 @@ kind: CronJob
 metadata:
   name: omero-autotagger-cronjob
 spec:
-  schedule: "0 0 * * 0"
+  schedule: "0 0 * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: autotagger
-            image: 
-            imagePullPolicy: IfNotPresent
-            command: ["/bin/sh", "-c"]
-            args: 
-            - python3 /src/omero_autotagger/__main__.py /config/tag_rules.yml'
-            - --patch /config/patch.py
-            - -s ${OMERO_SERVER}
-            - -p ${OMERO_PORT:-4064} 
-            - -u ${OMERO_USER}
-            - -w ${OMERO_PASS}
-            - $([ ! -z $OMERO_SECURE ] && echo '-S')
-
-            envFrom:
-            - secretRef: 
-              name: omero-connection-secret
-            volumeMounts:
-            - name: config-volume
-              mountPath: /config
+            - name: autotagger
+              image: ghcr.io/lavlabinfrastructure/omero-autotagger:1.0.0
+              imagePullPolicy: IfNotPresent
+              command:
+                - "/bin/sh"
+              args:
+                  - '-c'
+                  - "python3 /app/src/omero_autotagger/__main__.py /config/tag_rules.yml --patch /config/patch.py -s  ${OMERO_SERVER} -p  ${OMERO_PORT:-4064} -u  ${OMERO_USERNAME} -w  ${OMERO_PASSWORD} $([ ! -z $OMERO_SECURE ] && echo '-S')"
+  
+              env:
+                - name: "OMERO_USERNAME"
+                  valueFrom:
+                    secretKeyRef:
+                      name: omero-connection-secret
+                      key: username
+                - name: "OMERO_PASSWORD"
+                  valueFrom:
+                    secretKeyRef:
+                      name: omero-connection-secret
+                      key: password
+                - name: "OMERO_SERVER"
+                  valueFrom:
+                    secretKeyRef:
+                      name: omero-connection-secret
+                      key: server
+                - name: "OMERO_PORT"
+                  valueFrom:
+                    secretKeyRef:
+                      name: omero-connection-secret
+                      key: port
+                - name: "OMERO_SECURE"
+                  value: "enabled"
+              volumeMounts:
+                - name: config-volume
+                  mountPath: /config
 
           restartPolicy: OnFailure
           volumes:
-          - name: config-volume
-            configMap:
-              name: omero-autotagger-config
+            - name: config-volume
+              configMap:
+                name: omero-autotagger-config

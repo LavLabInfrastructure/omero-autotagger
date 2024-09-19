@@ -58,7 +58,7 @@ data:
       rules:
         - attribute_path: ["image", "roi", "shape", "textvalue"]
           operation: eq
-          value: "Transferred Annotations"
+          value: "Transferred Annotation"
     
     - name: PROSTATE
       rules:

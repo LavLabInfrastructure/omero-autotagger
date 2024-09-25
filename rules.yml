@@ -4,7 +4,10 @@
     - Deeper
     - Deeper2
     - Deeper3
-    - Deeper4                                                                       
+    - Deeper4
+    - 2
+    - 3
+    - 4
 
 - name: Annotate
   rules:
@@ -17,23 +20,23 @@
       operation: gt
       value: 0
 
-- name: "Transferred ROIs"
+- name: "Transferred_ROIs"
   rules:
     - attribute_path: ["image", "roi", "shape", "textvalue"]
       operation: eq
-      value: "Transferred ROIs"
+      value: "Transferred Annotation"
 
 - name: PROSTATE
   rules:
     - attribute_path: ["image", "parent", "parent"]
       operation: eq
       value: "PROSTATE"
-- name: "Benign Atrophy"
+- name: "Benign_Atrophy"
   rules:
     - attribute_path: ["image", "roi", "shape", "strokecolor"]
       operation: eq
       value: 255
-- name: "Seminal Vesicles"
+- name: "Seminal_Vesicles"
   rules:
     - attribute_path: ["image", "roi", "shape", "strokecolor"]
       operation: eq
@@ -48,22 +51,22 @@
     - attribute_path: ["image", "roi", "shape", "strokecolor"]
       operation: eq
       value: -15728385
-- name: "Grade 3"
+- name: "Grade_3"
   rules:
     - attribute_path: ["image", "roi", "shape", "strokecolor"]
       operation: eq
       value: 822031103
-- name: "Grade 4 FG"
+- name: "Grade_4_FG"
   rules:
     - attribute_path: ["image", "roi", "shape", "strokecolor"]
       operation: eq
       value: -387841
-- name: "Grade 4 CG"
+- name: "Grade_4_CG"
   rules:
     - attribute_path: ["image", "roi", "shape", "strokecolor"]
       operation: eq
       value: -32047105
-- name: "Grade 5"
+- name: "Grade_5"
   rules:
     - attribute_path: ["image", "roi", "shape", "strokecolor"]
       operation: eq

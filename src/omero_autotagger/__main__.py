@@ -415,8 +415,8 @@ class OmeroTagger:
                     f" {parent_obj.getName()}: TRUE: {true_tag_vals} FALSE: {false_tag_vals}"
                 )
                 existing_links = parent_obj.listAnnotations()
+                to_delete = []
                 for tag_val in false_tag_vals:
-                    to_delete = []
                     for ann in existing_links:
                         if isinstance(ann, omero.gateway.TagAnnotationWrapper):
                             val = ann.getValue()
@@ -424,10 +424,10 @@ class OmeroTagger:
                                 to_delete.append(ann.link.id)
                             if val in true_tag_vals:
                                 true_tag_vals.remove(val)
-                    if to_delete:
-                        self.conn.deleteObjects(
-                            "ImageAnnotationLink", to_delete, wait=True
-                        )
+                if to_delete:
+                    self.conn.deleteObjects(
+                        "ImageAnnotationLink", to_delete, wait=True
+                    )
 
                 for tag_val in true_tag_vals:
                     tag = self._get_tag(tag_val)

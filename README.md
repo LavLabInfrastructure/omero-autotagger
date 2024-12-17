@@ -4,12 +4,18 @@
 OMERO.AutoTagger is a utility that allows you to define a set of tagging rules in a YAML file. These rules are then used to traverse the OMERO object model. Each parent object (primarily images) and its children are checked to see if they match a set of parameters. If a match is found, the image is tagged with the corresponding tag name. A very common use case is tagging images based on the number of ROIs.
 
 ## Requirements
-- Python 3.6 or above
-- Python packages: `re`, `sys`, `yaml`, `logging`, `argparse`, `importlib.util`, `inflect`, `omero.gateway`
+- Python 3.8 or above
+- Python packages: `pyyaml`, `inflect`, `omero-py`
 
 These dependencies can be installed via pip:
+```sh
+pip3 install omero-py PyYAML inflect
 ```
-pip install omero-py PyYAML inflect
+zeroc-ice, an omero-py dependency, is troublesome on apple silicon, installing our lavlab-python-utils package streamlines the installation process
+```sh
+python3 -m pip install https://github.com/laviolette-lab/lavlab-python-utils/releases/latest/download/lavlab_python_utils-latest-py3-none-any.whl
+python3 -m pip install 'lavlab-python-utils[all]'
+python3 -m pip install inflect
 ```
 
 ## Usage
@@ -17,9 +23,13 @@ pip install omero-py PyYAML inflect
 1. Define your tag rules in a YAML file. See the provided example file for the required structure and syntax.
 
 2. Run the script from the command line using the following syntax:
-
+### From Install: (pypi coming soon)
 ```
-python autotagger.py [tag_rules.yml] [patch.py] -s [server] -p [port] -u [user] -w [password] -S [secure] --session [session_key]
+python3 -m omero_autotagger <path to tag_rules.yml> [path to patch.py] -s <server> -p <port> -u [user] -w [password] -S [secure] --session [session_key]
+```
+### From Source:
+```
+python3 src/omero_autotagger <path to tag_rules.yml> [path to patch.py] -s <server> -p <port> -u [user] -w [password] -S [secure] --session [session_key]
 ```
 
 Here is a brief explanation of each argument:
@@ -28,23 +38,24 @@ Here is a brief explanation of each argument:
 - `patch.py`: Path to the Python patch script to use for tagging.
 - `server`: Required. Address of the OMERO server to connect to.
 - `port`: Required. Port number of the OMERO server to connect to.
+    * With the increased adoption of OMERO API over websockets, we decided to make this required, may be assumed in future updates.
 - `user`: Username for the OMERO server. This is required if no session key is provided.
 - `password`: Password for the OMERO server. This is required if no session key is provided.
 - `secure`: Establishes a secure connection to the server. If not specified, a secure connection is used to login and then switched to unsecure by default.
-- `session`: Session key to use for connecting to the server. If this is provided, username and password are not required.
+- `session`: Session key to use for connecting to the server. If this is provided, username and password will be ignored.
 
 ## Example Usage
 
 Given a YAML file `tag_rules.yaml` and patch script `patch.py`:
 
 ```
-python autotagger.py tag_rules.yaml patch.py -s myserver.com -p 4064 -u myuser -w mypassword
+python3 -m omero_autotagger rules.yml patch.py -s myserver.com -p 4064 -u myuser -w mypassword
 ```
 
 Or using a session key:
 
 ```
-python autotagger.py tag_rules.yaml patch.py -s myserver.com -p 4064 --session mysesskey
+python3 -m omero_autotagger rules.yml patch.py -s myserver.com -p 4064 --session mysesskey
 ```
 
 This will establish a connection to the specified OMERO server, load the tagging rules from the provided YAML file, apply these rules using the provided patch script (if any), and tag the images accordingly.

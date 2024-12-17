@@ -10,7 +10,7 @@ plugins:
   - autorefs
 
 nav:
-  - Home: home.md
+  - Home: index.md
   - Getting Started: 
     - Installation: installation.md
     - Requirements: requirements.md
